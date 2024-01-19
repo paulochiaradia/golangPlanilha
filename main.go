@@ -31,6 +31,17 @@ func changePaymentMethod(sheet *xlsx.Sheet, oldName, newName string, ch chan<- e
 	}
 }
 
+// Funcao para alterar o nome do vendor de uma folha (planilha2)
+func changeVendorName2(sheet *xlsx.Sheet, oldName, newName string, ch chan<- error) {
+	// Iterar sobre as linhas da folha
+	for _, row := range sheet.Rows {
+		// Verificar e alterar o nome dos vendedores
+		if len(row.Cells) > 0 && row.Cells[0].String() == oldName {
+			row.Cells[0].SetValue(newName)
+		}
+	}
+}
+
 func changeStatus(sheet *xlsx.Sheet, oldName, newName string, ch chan<- error) {
 	// Iterar sobre as linhas da folha
 	for _, row := range sheet.Rows {
@@ -48,11 +59,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	file2, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/relatoriosLoja/dezembro2023/estatistica.xlsx")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Criar um canal para erros
 	errCh := make(chan error, len(file.Sheets))
+	errCh2 := make(chan error, len(file2.Sheets))
 
 	// Criar um grupo de espera para as goroutines
 	var wg sync.WaitGroup
+	var wg2 sync.WaitGroup
 
 	// Iterar sobre as folhas da planilha
 	for _, sheet := range file.Sheets {
@@ -138,6 +156,54 @@ func main() {
 
 	// Salvar as alterações de volta no Excel
 	err = file.Save("C:/Users/paulo/OneDrive/relatoriosLoja/vendasNormatizado.xlsx")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Iterar sobre as folhas da planilha2
+	for _, sheet2 := range file2.Sheets {
+
+		// Incrementar o grupo de espera para cada folha
+		wg2.Add(1) // Incrementar para cada função (changeVendorName e changePaymentMethod)
+
+		// Iniciar goroutines para alterar o nome dos vendedores e o método de pagamento na folha
+		go func(sheet2 *xlsx.Sheet) {
+			defer wg2.Done()
+			changeVendorName2(sheet2, "000070-ALEX CHIARADIA", "OUTROS", errCh2)
+			changeVendorName2(sheet2, "000555-DANIEL TRABIJU", "OUTROS", errCh2)
+			changeVendorName2(sheet2, "004415-EDUARDO", "OUTROS", errCh2)
+			changeVendorName2(sheet2, "004673-VINICIUS ZAINA", "OUTROS", errCh2)
+			changeVendorName2(sheet2, "005168-VANESSA ZAINA", "OUTROS", errCh2)
+			changeVendorName2(sheet2, "006432-PAULO ROBERTO CHIA", "OUTROS", errCh2)
+			changeVendorName2(sheet2, "006621-SILVIA HELENA FERR", "OUTROS", errCh2)
+			changeVendorName2(sheet2, "004741-GLAUCIA GUEDES", "OUTROS", errCh2)
+			changeVendorName2(sheet2, "005208-CAMILA TEIXEIRA", "CAMILA", errCh2)
+			changeVendorName2(sheet2, "006525-JOANA VITORIA MORE", "JOANA", errCh)
+			changeVendorName2(sheet2, "008639-JULIA RIBEIRO BARB", "JULIA", errCh)
+			changeVendorName2(sheet2, "003820-JULIANA CHIARADIA", "JULIANA", errCh)
+			changeVendorName2(sheet2, "008737-PATRICIA VASCONCEL", "PATRICIA", errCh)
+			changeVendorName2(sheet2, "008722-PAULO AUGUSTO NOGU", "PAULO", errCh)
+			changeVendorName2(sheet2, "006057-PEDRO HENRIQUE DE", "PEDRO", errCh)
+			changeVendorName2(sheet2, "006301-TIAGO SILVA", "TIAGO", errCh)
+			changeVendorName2(sheet2, "004923-VANESSA PRADO", "VANESSA", errCh)
+			changeVendorName2(sheet2, "006572-WELLISON RODRIGUES", "WELLISON", errCh)
+			changeVendorName2(sheet2, "008589-RAFAELA NEVES", "RAFAELA", errCh)
+		}(sheet2)
+	}
+	// Aguardar a conclusão de todas as goroutines
+	wg2.Wait()
+
+	// Fechar o canal de erros
+	close(errCh2)
+
+	// Verificar se houve algum erro durante a execução das goroutines
+	for err := range errCh2 {
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	// Salvar as alterações de volta no Excel
+	err = file2.Save("C:/Users/paulo/OneDrive/relatoriosLoja/estatisticaNormatizado.xlsx")
 	if err != nil {
 		log.Fatal(err)
 	}
