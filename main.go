@@ -52,6 +52,26 @@ func changeStatus(sheet *xlsx.Sheet, oldName, newName string, ch chan<- error) {
 	}
 }
 
+func changeBlank(sheet *xlsx.Sheet, oldName, newName string, ch chan<- error) {
+	// Iterar sobre as linhas da folha
+	for _, row := range sheet.Rows {
+		// Verificar e alterar o metodo de pagamento (considerando que a coluna é a sexta, indexada em zero)
+		if len(row.Cells) > 0 && strings.TrimSpace(row.Cells[1].String()) == "" {
+			row.Cells[1].SetValue(newName)
+		}
+	}
+}
+
+func changeSession(sheet *xlsx.Sheet, oldName, newName string, ch chan<- error) {
+	// Iterar sobre as linhas da folha
+	for _, row := range sheet.Rows {
+		// Verificar e alterar o metodo de pagamento (considerando que a coluna é a sexta, indexada em zero)
+		if len(row.Cells) > 0 && row.Cells[1].String() == oldName {
+			row.Cells[1].SetValue(newName)
+		}
+	}
+}
+
 func main() {
 	// Ler a planilha do Excel
 	file, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/relatoriosLoja/dezembro2023/vendasDezembro.xlsx")
@@ -64,13 +84,27 @@ func main() {
 		log.Fatal(err)
 	}
 
+	file3, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/relatoriosLoja/dezembro2023/vendedorPorMarca.xlsx")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file4, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/relatoriosLoja/dezembro2023/vendedorPorSecao.xlsx")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Criar um canal para erros
 	errCh := make(chan error, len(file.Sheets))
 	errCh2 := make(chan error, len(file2.Sheets))
+	errCh3 := make(chan error, len(file3.Sheets))
+	errCh4 := make(chan error, len(file4.Sheets))
 
 	// Criar um grupo de espera para as goroutines
 	var wg sync.WaitGroup
 	var wg2 sync.WaitGroup
+	var wg3 sync.WaitGroup
+	var wg4 sync.WaitGroup
 
 	// Iterar sobre as folhas da planilha
 	for _, sheet := range file.Sheets {
@@ -207,6 +241,125 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Arquivo salvo com sucesso!")
-	fmt.Println("Alterações concluídas com sucesso!")
+
+	// Iterar sobre as folhas da planilha3
+	for _, sheet3 := range file3.Sheets {
+		sheet3.Rows[0].Cells[0].SetValue("Vendedor")
+		// Incrementar o grupo de espera para cada folha
+		wg3.Add(1) // Incrementar para cada função (changeVendorName e changePaymentMethod)
+
+		// Iniciar goroutines para alterar o nome dos vendedores e o método de pagamento na folha
+		go func(sheet3 *xlsx.Sheet) {
+			defer wg3.Done()
+			changeVendorName2(sheet3, "000070-ALEX CHIARADIA", "OUTROS", errCh3)
+			changeVendorName2(sheet3, "000555-DANIEL TRABIJU", "OUTROS", errCh3)
+			changeVendorName2(sheet3, "004415-EDUARDO", "OUTROS", errCh3)
+			changeVendorName2(sheet3, "004673-VINICIUS ZAINA", "OUTROS", errCh3)
+			changeVendorName2(sheet3, "005168-VANESSA ZAINA", "OUTROS", errCh3)
+			changeVendorName2(sheet3, "006432-PAULO ROBERTO CHIARADIA NETO", "OUTROS", errCh3)
+			changeVendorName2(sheet3, "006621-SILVIA HELENA FERREIRA DO PRADO", "OUTROS", errCh3)
+			changeVendorName2(sheet3, "004741-GLAUCIA GUEDES", "OUTROS", errCh3)
+			changeVendorName2(sheet3, "005208-CAMILA TEIXEIRA", "CAMILA", errCh3)
+			changeVendorName2(sheet3, "006525-JOANA VITORIA MOREIRA DE JESUS", "JOANA", errCh3)
+			changeVendorName2(sheet3, "008639-JULIA RIBEIRO BARBOSA", "JULIA", errCh3)
+			changeVendorName2(sheet3, "003820-JULIANA CHIARADIA", "JULIANA", errCh3)
+			changeVendorName2(sheet3, "008737-PATRICIA VASCONCELOS VITORIANO", "PATRICIA", errCh3)
+			changeVendorName2(sheet3, "008722-PAULO AUGUSTO NOGUEIRA", "PAULO", errCh3)
+			changeVendorName2(sheet3, "006057-PEDRO HENRIQUE DE SOUZA DRAIHER", "PEDRO", errCh3)
+			changeVendorName2(sheet3, "006301-TIAGO SILVA", "TIAGO", errCh3)
+			changeVendorName2(sheet3, "004923-VANESSA PRADO", "VANESSA", errCh3)
+			changeVendorName2(sheet3, "006572-WELLISON RODRIGUES", "WELLISON", errCh3)
+			changeBlank(sheet3, "", "SEM MARCA", errCh3)
+		}(sheet3)
+
+		// Aguardar a conclusão de todas as goroutines
+		wg3.Wait()
+
+		// Fechar o canal de erros
+		close(errCh3)
+
+		// Verificar se houve algum erro durante a execução das goroutines
+		for err := range errCh3 {
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+		// Salvar as alterações de volta no Excel
+		err = file3.Save("C:/Users/paulo/OneDrive/relatoriosLoja/vendasPorMarcaNormatizado.xlsx")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Iterar sobre as folhas da planilha4
+		for _, sheet4 := range file4.Sheets {
+			sheet4.Rows[0].Cells[0].SetValue("Vendedor")
+			// Incrementar o grupo de espera para cada folha
+			wg4.Add(1) // Incrementar para cada função (changeVendorName e changePaymentMethod)
+
+			// Iniciar goroutines para alterar o nome dos vendedores e o método de pagamento na folha
+			go func(sheet4 *xlsx.Sheet) {
+				defer wg4.Done()
+				changeVendorName2(sheet4, "000070-ALEX CHIARADIA", "OUTROS", errCh4)
+				changeVendorName2(sheet4, "000555-DANIEL TRABIJU", "OUTROS", errCh4)
+				changeVendorName2(sheet4, "004415-EDUARDO", "OUTROS", errCh4)
+				changeVendorName2(sheet4, "004673-VINICIUS ZAINA", "OUTROS", errCh4)
+				changeVendorName2(sheet4, "005168-VANESSA ZAINA", "OUTROS", errCh4)
+				changeVendorName2(sheet4, "006432-PAULO ROBERTO CHIARADIA NETO", "OUTROS", errCh4)
+				changeVendorName2(sheet4, "006621-SILVIA HELENA FERREIRA DO PRADO", "OUTROS", errCh4)
+				changeVendorName2(sheet4, "004741-GLAUCIA GUEDES", "OUTROS", errCh4)
+				changeVendorName2(sheet4, "005208-CAMILA TEIXEIRA", "CAMILA", errCh4)
+				changeVendorName2(sheet4, "006525-JOANA VITORIA MOREIRA DE JESUS", "JOANA", errCh4)
+				changeVendorName2(sheet4, "008639-JULIA RIBEIRO BARBOSA", "JULIA", errCh4)
+				changeVendorName2(sheet4, "003820-JULIANA CHIARADIA", "JULIANA", errCh4)
+				changeVendorName2(sheet4, "008737-PATRICIA VASCONCELOS VITORIANO", "PATRICIA", errCh4)
+				changeVendorName2(sheet4, "008722-PAULO AUGUSTO NOGUEIRA", "PAULO", errCh4)
+				changeVendorName2(sheet4, "006057-PEDRO HENRIQUE DE SOUZA DRAIHER", "PEDRO", errCh4)
+				changeVendorName2(sheet4, "006301-TIAGO SILVA", "TIAGO", errCh4)
+				changeVendorName2(sheet4, "004923-VANESSA PRADO", "VANESSA", errCh4)
+				changeVendorName2(sheet4, "006572-WELLISON RODRIGUES", "WELLISON", errCh4)
+				changeBlank(sheet4, "", "SEM SESAO", errCh4)
+				changeSession(sheet4, "01-BASICO", "BASICO", errCh4)
+				changeSession(sheet4, "04-HIDRAULICA", "HIDRAULICA", errCh4)
+				changeSession(sheet4, "02-TINTAS", "TINTAS", errCh4)
+				changeSession(sheet4, "03-ELETRICA", "ELETRICA", errCh4)
+				changeSession(sheet4, "06-FERRAGENS", "FERRAGENS", errCh4)
+				changeSession(sheet4, "05-MADEIRAS", "MADEIRAS", errCh4)
+				changeSession(sheet4, "MAT ELETRICO", "ELETRICA", errCh4)
+				changeSession(sheet4, "08-CASA JARDIM", "JARDIM", errCh4)
+				changeSession(sheet4, "07-FERRAMENTA", "FERRAMENTAS", errCh4)
+				changeSession(sheet4, "FERRAMENTA MANUAL", "FERRAMENTAS", errCh4)
+				changeSession(sheet4, "05-PISOS REVEST", "PISOS E REVEST", errCh4)
+				changeSession(sheet4, "14-MADEIRAS", "MADEIRAS", errCh4)
+				changeSession(sheet4, "09-DIVERSOS", "DIVERSOS", errCh4)
+				changeSession(sheet4, "10-PIAS E GABINETES", "PIAS E GABINETES", errCh4)
+				changeSession(sheet4, "13-EPIS", "EPIS", errCh4)
+				changeSession(sheet4, "11-ESQUADRIAS", "ESQUADRIAS", errCh4)
+				changeSession(sheet4, "BASICAO", "BASICO", errCh4)
+				changeSession(sheet4, "BROCAS MISTA", "BROCAS", errCh4)
+				changeSession(sheet4, "BROCAS PARA CONCRETO", "BROCAS", errCh4)
+				changeSession(sheet4, "BROCAS PARA MADEIRA", "BROCAS", errCh4)
+			}(sheet4)
+			// Aguardar a conclusão de todas as goroutines
+			wg4.Wait()
+
+			// Fechar o canal de erros
+			close(errCh4)
+
+			// Verificar se houve algum erro durante a execução das goroutines
+			for err := range errCh4 {
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+
+			err = file4.Save("C:/Users/paulo/OneDrive/relatoriosLoja/vendasPorSecaoNormatizado.xlsx")
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Println("Arquivo salvo com sucesso!")
+			fmt.Println("Alterações concluídas com sucesso!")
+		}
+	}
 }
