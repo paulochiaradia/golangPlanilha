@@ -74,17 +74,17 @@ func changeBrand(sheet *xlsx.Sheet, oldName, newName string, ch chan<- error) {
 
 func main() {
 	// Ler a planilha do Excel
-	file, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/relatoriosLoja/marco2024/vendasVendedor.xlsx")
+	file, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/AnalisesMatCont/VendasJaneiro.xlsx")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	file2, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/relatoriosLoja/marco2024/estatistica.xlsx")
+	file2, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/AnalisesMatCont/estatisticaJaneiro.xlsx")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	file3, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/relatoriosLoja/marco2024/vendasMarca.xlsx")
+	file3, err := xlsx.OpenFile("C:/Users/paulo/OneDrive/AnalisesMatCont/vendasPorMarcaJaneiro.xlsx")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -129,6 +129,7 @@ func main() {
 			changeVendorName(sheet, "WELLISON RODRIGUES                      -006572", "WELLISON", errCh)
 			changeVendorName(sheet, "RAFAELA NEVES RAYMUNDO                  -008589", "RAFAELA", errCh)
 			changeVendorName(sheet, "RAFAELA NEVES                           -008589", "RAFAELA", errCh)
+			changeVendorName(sheet, "WAGNER FRANCA LOPES SAMPAIO             -006503", "WAGNER", errCh)
 		}(sheet)
 
 		go func(sheet *xlsx.Sheet) {
@@ -185,7 +186,7 @@ func main() {
 	}
 
 	// Salvar as alterações de volta no Excel
-	err = file.Save("C:/Users/paulo/OneDrive/relatoriosLoja/vendasNormatizado.xlsx")
+	err = file.Save("C:/Users/paulo/OneDrive/AnalisesMatCont/VendasJaneiroNormatizado.xlsx")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -219,6 +220,7 @@ func main() {
 			changeVendorName2(sheet2, "004923-VANESSA PRADO", "VANESSA", errCh2)
 			changeVendorName2(sheet2, "006572-WELLISON RODRIGUES", "WELLISON", errCh2)
 			changeVendorName2(sheet2, "008589-RAFAELA NEVES", "RAFAELA", errCh2)
+			changeVendorName2(sheet2, "006503-WAGNER FRANCA LOPE", "WAGNER", errCh2)
 		}(sheet2)
 	}
 	// Aguardar a conclusão de todas as goroutines
@@ -234,7 +236,7 @@ func main() {
 		}
 	}
 	// Salvar as alterações de volta no Excel
-	err = file2.Save("C:/Users/paulo/OneDrive/relatoriosLoja/estatisticaNormatizado.xlsx")
+	err = file2.Save("C:/Users/paulo/OneDrive/AnalisesMatCont/estatisticaNormatizado.xlsx")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -290,7 +292,7 @@ func main() {
 		}
 
 		// Salvar as alterações de volta no Excel
-		err = file3.Save("C:/Users/paulo/OneDrive/relatoriosLoja/vendasPorMarcaNormatizado.xlsx")
+		err = file3.Save("C:/Users/paulo/OneDrive/AnalisesMatCont/VendasPorMarcaNormatizado.xlsx")
 		if err != nil {
 			log.Fatal(err)
 		}
