@@ -129,6 +129,7 @@ func main() {
 			changeVendorName(sheet, "WELLISON RODRIGUES                      -006572", "WELLISON", errCh)
 			changeVendorName(sheet, "RAFAELA NEVES RAYMUNDO                  -008589", "RAFAELA", errCh)
 			changeVendorName(sheet, "RAFAELA NEVES                           -008589", "RAFAELA", errCh)
+			changeVendorName(sheet, "ESTEFANI MORAES PENINA                  -009035", "ESTEFANI,", errCh)
 			changeVendorName(sheet, "WAGNER FRANCA LOPES SAMPAIO             -006503", "WAGNER", errCh)
 		}(sheet)
 
@@ -221,6 +222,7 @@ func main() {
 			changeVendorName2(sheet2, "006572-WELLISON RODRIGUES", "WELLISON", errCh2)
 			changeVendorName2(sheet2, "008589-RAFAELA NEVES", "RAFAELA", errCh2)
 			changeVendorName2(sheet2, "006503-WAGNER FRANCA LOPE", "WAGNER", errCh2)
+			changeVendorName2(sheet2, "009035-ESTEFANI MORAES PE", "ESTEFANI", errCh2)
 		}(sheet2)
 	}
 	// Aguardar a conclusão de todas as goroutines
@@ -270,6 +272,7 @@ func main() {
 			changeVendorName2(sheet3, "004923-VANESSA PRADO", "VANESSA", errCh3)
 			changeVendorName2(sheet3, "006572-WELLISON RODRIGUES", "WELLISON", errCh3)
 			changeVendorName2(sheet3, "008589-RAFAELA NEVES", "RAFAELA", errCh3)
+			changeVendorName2(sheet3, "009035-ESTEFANI MORAES PENINA", "ESTEFANI", errCh3)
 			changeBlank(sheet3, "", "*****", errCh3)
 			changeBrand(sheet3, "INHAPIM CEDR MESCL", "INHAPIM", errCh3)
 			changeBrand(sheet3, "INHAPIM GARAPEIRA", "INHAPIM", errCh3)
